@@ -30,7 +30,7 @@
         body {
             background-color: RGBA(232, 52, 78, 0.2);
             min-height: 100vh;
-            {#padding-top: 3.25rem;#}
+        {#padding-top: 3.25rem;#}
         }
 
         .title {
@@ -85,6 +85,7 @@
 
         .card-box {
             margin: 20px 40px auto 40px;
+
         }
 
         .writebtn {
@@ -101,14 +102,24 @@
             font-family: 'Gowun Dodum', sans-serif;
         }
 
+
         .card {
-            height: 500px;
+            height: 400px;
+            margin: 20px;
+
         }
 
         .wrap {
-            width:100%;
-            height:100%;
-            position:relative;
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+        .buttonbox {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: end;
+            margin: 10px;
         }
     </style>
 
@@ -132,92 +143,101 @@
                 }
             })
         }
+         function logout(){
+        $.removeCookie('mytoken');
+        alert('로그아웃!')
+        window.location.href='/login'
+      }
     </script>
 
 </head>
 <body>
-    <div class="wrap">
-        <section class="hero is-white">
-            <div class="hero-body has-text-centered" style="padding-bottom:1rem;margin:auto;">
-                <h1 class="title is-sparta">YouReco</h1>
-                <h3 class="subtitle is-sparta">더 재밌게 살자!</h3>
-            </div>
-        </section>
-        {% if videos is not none %}
-            <div class="card-box">
-                <div class="row row-cols-1 row-cols-md-2 g-4">
-                    {% for video in videos %}
-                        <div class="col">
-                            <div class="card">
-                                <iframe width="100%" height="100%" src="{{ video.embed }}" title="YouTube video player"
-                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                        allowfullscreen></iframe>
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ video.nickname }}</h5>
-                                    <p class="card-text">{{ video.comment }}</p>
-                                </div>
+<div class="wrap">
+    <section class="hero is-white">
+        <div class="hero-body has-text-centered" style="padding-bottom:1rem;margin:auto;">
+            <h1 class="title is-sparta">YouReco</h1>
+            <h3 class="subtitle is-sparta">더 재밌게 살자!</h3>
+        </div>
+    </section>
+    <div class="buttonbox">
+        <button class="button is-danger" onclick="logout()">로그아웃하기</button>
+    </div>
+    {% if videos is not none %}
+        <div class="card-box">
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                {% for video in videos %}
+                    <div class="col">
+                        <div class="card">
+                            <iframe width="100%" height="100%" src="{{ video.embed }}" title="YouTube video player"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowfullscreen></iframe>
+                            <div class="card-body">
+                                <h5 class="card-title">{{ video.nickname }}</h5>
+                                <p class="card-text">{{ video.comment }}</p>
                             </div>
                         </div>
-                    {% endfor %}
-                </div>
+                    </div>
+                {% endfor %}
             </div>
-        {% endif %}
-        <div class="modal" id="video-post">
-            <div class="modal-background" onclick='$("#video-post").removeClass("is-active")'></div>
-            <div class="modal-content">
-                <div class="box">
-                    <article class="media">
-                        <div class="media-content">
-                            <div class="field">
-                                <p class="control">
-                                <div class="mypost" id="postbox">
-                                    <div class="form-floating mb-3">
-                                        <input type="url" class="form-control" id="url"
-                                               placeholder="name@example.com">
-                                        <label for="floatingInput">영화URL</label>
-                                    </div>
-                                    <div class="input-group mb-3">
-                                        <label class="input-group-text" for="inputGroupSelect01">이모티콘</label>
-                                        <select class="form-select" id="emoticon">
-                                            <option selected>--선택하기--</option>
-                                            <option value="1">1점</option>
-                                            <option value="2">2점</option>
-                                            <option value="3">3점</option>
-                                            <option value="4">4점</option>
-                                            <option value="5">5점</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-floating">
+        </div>
+    {% endif %}
+    <div class="modal" id="video-post">
+        <div class="modal-background" onclick='$("#video-post").removeClass("is-active")'></div>
+        <div class="modal-content">
+            <div class="box">
+                <article class="media">
+                    <div class="media-content">
+                        <div class="field">
+                            <p class="control">
+                            <div class="mypost" id="postbox">
+                                <div class="form-floating mb-3">
+                                    <input type="url" class="form-control" id="url"
+                                           placeholder="name@example.com">
+                                    <label for="floatingInput">영화URL</label>
+                                </div>
+                                <div class="input-group mb-3">
+                                    <label class="input-group-text" for="inputGroupSelect01">이모티콘</label>
+                                    <select class="form-select" id="emoticon">
+                                        <option selected>--선택하기--</option>
+                                        <option value="1">1점</option>
+                                        <option value="2">2점</option>
+                                        <option value="3">3점</option>
+                                        <option value="4">4점</option>
+                                        <option value="5">5점</option>
+                                    </select>
+                                </div>
+                                <div class="form-floating">
                                     <textarea class="form-control" placeholder="Leave a comment here" id="comment"
                                               style="height: 100px"></textarea>
-                                        <label for="floatingTextarea2">코멘트</label>
-                                    </div>
+                                    <label for="floatingTextarea2">코멘트</label>
                                 </div>
-                                </p>
                             </div>
-                            <nav class="level is-mobile">
-                                <div class="level-left">
-
-                                </div>
-                                <div class="level-right">
-                                    <div class="level-item">
-                                        <a class="button is-sparta" onclick="post()">포스팅하기</a>
-                                    </div>
-                                    <div class="level-item">
-                                        <a class="button is-sparta is-outlined"
-                                           onclick='$("#video-post").removeClass("is-active")'>취소</a>
-                                    </div>
-                                </div>
-                            </nav>
+                            </p>
                         </div>
-                    </article>
-                </div>
+                        <nav class="level is-mobile">
+                            <div class="level-left">
+
+                            </div>
+                            <div class="level-right">
+                                <div class="level-item">
+                                    <a class="button is-sparta" onclick="post()">포스팅하기</a>
+                                </div>
+                                <div class="level-item">
+                                    <a class="button is-sparta is-outlined"
+                                       onclick='$("#video-post").removeClass("is-active")'>취소</a>
+                                </div>
+                            </div>
+                        </nav>
+                    </div>
+                </article>
             </div>
-            <button class="modal-close is-large" aria-label="close"
-                    onclick='$("#video-post").removeClass("is-active")'></button>
         </div>
-        <button class="writebtn" onclick='$("#video-post").addClass("is-active")'>추가하기</button>
+        <button class="modal-close is-large" aria-label="close"
+                onclick='$("#video-post").removeClass("is-active")'></button>
     </div>
+    <button class="writebtn" onclick='$("#video-post").addClass("is-active")'>추가하기</button>
+
+</div>
 
 </body>
 </html>
