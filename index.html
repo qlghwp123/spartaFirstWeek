@@ -31,8 +31,13 @@
             background-color: RGBA(232, 52, 78, 0.2);
             min-height: 100vh;
         {#padding-top: 3.25rem;#}
-        }
 
+        }
+        .today {
+            font-weight: lighter;
+
+
+             }
         .title {
             font-weight: 800;
             font-size: 5rem;
@@ -148,6 +153,8 @@
         alert('로그아웃!')
         window.location.href='/login'
       }
+
+
     </script>
 
 </head>
@@ -157,11 +164,15 @@
         <div class="hero-body has-text-centered" style="padding-bottom:1rem;margin:auto;">
             <h1 class="title is-sparta">YouReco</h1>
             <h3 class="subtitle is-sparta">더 재밌게 살자!</h3>
+
         </div>
-    </section>
-    <div class="buttonbox">
+        <div class="buttonbox">
         <button class="button is-danger" onclick="logout()">로그아웃하기</button>
-    </div>
+        </div>
+        <p class="today" id="date"></p>
+    </section>
+
+
     {% if videos is not none %}
         <div class="card-box">
             <div class="row row-cols-1 row-cols-md-3 g-4">
@@ -235,9 +246,22 @@
         <button class="modal-close is-large" aria-label="close"
                 onclick='$("#video-post").removeClass("is-active")'></button>
     </div>
+
+
     <button class="writebtn" onclick='$("#video-post").addClass("is-active")'>추가하기</button>
 
 </div>
 
 </body>
+<script>
+    // 오늘 날짜 메인 화면에 띄우기 위한 변수 정의
+    let today = new Date();
+    let year = today.getFullYear() // 년도
+    let month = today.getMonth() + 1 // 월
+    let day = today.getDate() // 일
+    let week = ['일', '월', '화', '수', '목', '금']
+    let getDate = today.getDay() // 요일
+    let date = week[getDate]
+    document.getElementById("date").innerHTML = year + '년 ' + month + '월 ' + day + '일 ' + date + "요일"
+</script>
 </html>
