@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="en">
+<head>
+
+    <!-- Webpage Title -->
+    <title>{{ user_info.nickname }} | Today's YouTube</title>
+
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bulma CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+    <!-- Font Awesome CSS -->
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+    <!-- JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+    <script src="{{ url_for('static', filename='myjs.js') }}"></script>
+
+
+    <!-- Google Web Font for title and sub -->
+    <link href="https://fonts.googleapis.com/css2?family=Jua&family=Yeon+Sung&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Yeon+Sung&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: RGBA(232, 52, 78, 0.2);
+            min-height: 100vh;
+        }
+
+        .section {
+            padding: 1rem 1.5rem;
+            max-width: 750px;
+            margin: auto;
+        }
+
+        .title {
+            font-weight: 600;
+            font-size: 4rem;
+
+            font-family: 'Jua', sans-serif;
+            font-family: 'Yeon Sung', cursive;
+        }
+
+        .subtitle {
+            font-size: 2rem;
+
+            font-family: 'Nanum Brush Script', cursive;
+        }
+
+        .is-sparta {
+            color: #e8344e !important;
+        }
+
+        .button.is-sparta {
+            background-color: #e8344e;
+            border-color: transparent;
+            color: #fff !important;
+        }
+
+        .button.is-sparta.is-outlined {
+            background-color: transparent;
+            border-color: #e8344e;
+            color: #e8344e !important;
+        }
+
+        .help {
+            color: gray;
+        }
+    </style>
+
+    <script>
+        function sign_out() {
+            $.removeCookie('mytoken', {path: '/'});
+            alert('로그아웃!')
+            window.location.href = "/login"
+        }
+
+        function update_profile() {
+            let name = $('#input-name').val()
+            let file = $('#input-pic')[0].files[0]
+            let about = $("#textarea-about").val()
+            let form_data = new FormData()
+            form_data.append("file_give", file)
+            form_data.append("name_give", name)
+            form_data.append("about_give", about)
+            console.log(name, file, about, form_data)
+
+            $.ajax({
+                type: "POST",
+                url: "/update_profile",
+                data: form_data,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function (response) {
+                    if (response["result"] == "success") {
+                        alert(response["msg"])
+                        window.location.reload()
+
+                    }
+                }
+            });
+        }
+
+        {#function get_comments(username) {#}
+        {#    if (username == undefined) {#}
+        {#        username = ""#}
+        {#    }#}
+        function get_comments() {
+            $("#comment-box").empty()
+            $.ajax({
+                type: "GET",
+                url: "/get_comments",
+                //url: `/get_posts?username_give=${username}`,
+                data: {},
+                success: function (response) {
+                    if (response["result"] == "success") {
+                        let comments = response["comments"]
+                        for (let i = 0; i < comments.length; i++) {
+                            let comment = comments[i]
+                            let time_post = new Date(comment["date"])
+                            let time_before = time2str(time_post)
+                            //let class_heart = ""
+                            //if (comment["heart_by_me"]) {
+                            //    class_heart = "fa-heart"
+                            //} else {
+                            //    class_heart = "fa-heart-o"
+                            //}
+                            let class_heart = comment['heart_by_me'] ? "fa-heart" : "fa-heart-o"
+                            let count_heart = comment['count_heart']
+                            let html_temp = `<div class="box" id="${comment["_id"]}">
+                                        <article class="media">
+                                            <div class="media-left">
+                                                <a class="image is-64x64" href="/user/${comment['username']}">
+                                                    <img class="is-rounded" src="/static/${comment['profile_pic_real']}"
+                                                         alt="Image">
+                                                </a>
+                                            </div>
+                                            <div class="media-content">
+                                                <div class="content">
+                                                    <p>
+                                                        <strong>${comment['nickname']}</strong> <small>@${comment['id']}</small> <small>${time_before}</small>
+                                                        <br>
+                                                        ${comment['comment']}
+                                                    </p>
+                                                </div>
+                                                <nav class="level is-mobile">
+                                                    <div class="level-left">
+                                                        <a class="level-item is-sparta" aria-label="heart" onclick="toggle_like('${comment['_id']}', 'heart')">
+                                                            <span class="icon is-small"><i class="fa ${class_heart}"
+                                                                                           aria-hidden="true"></i></span>&nbsp;<span class="like-num">${num2str(count_heart)}</span>
+                                                        </a>
+                                                    </div>
+
+                                                </nav>
+                                            </div>
+                                        </article>
+                                    </div>`
+                            $("#comment-box").append(html_temp)
+                        }
+                    }
+                }
+            })
+        }
+
+        $(document).ready(function () {
+            get_comments();
+        })
+
+    </script>
+
+</head>
+
+<body class="has-navbar-fixed-top">
+<nav class="navbar is-fixed-top is-white" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+        <a class="navbar-item" onclick="window.location.href = '/'">
+            <img src="{{ url_for('static', filename='U_logo.png') }}">
+            <strong class="is-sparta"
+                    style="font-family: 'Jua', sans-serif;font-size: larger;">Today's U</strong>
+        </a>
+    </div>
+</nav>
+
+<section class="hero is-white">
+    <div class="hero-body" style="padding-bottom:1rem;margin:auto;min-width: 400px">
+        <article class="media">
+
+            <figure class="media-left" style="align-self: center">
+                <a class="image is-96x96" href="#">
+                    <img class="is-rounded" src="{{ url_for('static', filename=user_info.profile_pic_real) }}">
+                </a>
+            </figure>
+            <div class="media-content">
+                <div class="content">
+                    <p>
+                        <strong>{{ user_info.profile_name }}</strong> <small>@{{ user_info.id }}</small>
+                        <br>
+                        {{ user_info.profile_info }}
+                    </p>
+                </div>
+
+            </div>
+        </article>
+        {#        {% if status %}#}
+        <nav id="btns-me" class="level is-mobile" style="margin-top:2rem">
+            <a class="button level-item has-text-centered is-sparta" aria-label="edit"
+               onclick='$("#modal-edit").addClass("is-active")'>
+                프로필 수정&nbsp;&nbsp;&nbsp;<span class="icon is-small"><i class="fa fa-pencil"
+                                                                       aria-hidden="true"></i></span>
+            </a>
+
+            <a class="button level-item has-text-centered is-sparta is-outlined" aria-label="logout"
+               onclick="sign_out()">
+                로그아웃&nbsp;&nbsp;&nbsp;<span class="icon is-small"><i class="fa fa-sign-out"
+                                                                     aria-hidden="true"></i></span>
+            </a>
+        </nav>
+        <div class="modal" id="modal-edit">
+            <div class="modal-background" onclick='$("#modal-edit").removeClass("is-active")'></div>
+            <div class="modal-content">
+                <div class="box">
+                    <article class="media">
+                        <div class="media-content">
+                            <div class="field">
+                                <label class="label" for="input-name">이름</label>
+
+                                <p class="control">
+                                    <input id="input-name" class="input"
+                                           placeholder="이름을 적어주세요" value="{{ user_info.profile_name }}">
+                                </p>
+                            </div>
+                            <div class="field">
+                                <label class="label" for="input-pic">프로필 사진</label>
+
+                                <div class="control is-expanded">
+                                    <div class="file has-name">
+                                        <label class="file-label" style="width:100%">
+                                            <input id="input-pic" class="file-input" type="file"
+                                                   name="resume">
+                                            <span class="file-cta"><span class="file-icon"><i
+                                                    class="fa fa-upload"></i></span>
+                                    <span class="file-label">파일 선택</span>
+                                </span>
+                                            <span id="file-name" class="file-name"
+                                                  style="width:100%;max-width:100%">{{ user_info.profile_pic }}</span>
+                                        </label>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label class="label" for="textarea-about">나는 누구?</label>
+
+                                <p class="control">
+
+                            <textarea id="textarea-about" class="textarea"
+                                      placeholder="자기소개하기">{{ user_info.profile_info }}</textarea>
+                                </p>
+                            </div>
+                            <nav class="level is-mobile">
+                                <div class="level-left">
+
+                                </div>
+                                <div class="level-right">
+                                    <div class="level-item">
+                                        <a class="button is-sparta" onclick="update_profile()">업데이트</a>
+                                    </div>
+                                    <div class="level-item">
+                                        <a class="button is-sparta is-outlined"
+                                           onclick='$("#modal-edit").removeClass("is-active")'>취소</a>
+                                    </div>
+                                </div>
+                            </nav>
+                        </div>
+                    </article>
+                </div>
+            </div>
+            <button class="modal-close is-large" aria-label="close"
+                    onclick='$("#modal-edit").removeClass("is-active")'></button>
+        </div>
+        {#        {% endif %}#}
+    </div>
+</section>
+
+<div class="modal" id="modal-edit">
+    <div class="modal-background" onclick='$("#modal-edit").removeClass("is-active")'></div>
+    <div class="modal-content">
+        <div class="box">
+            <article class="media">
+                <div class="media-content">
+                    <div class="field">
+                        <label class="label" for="input-name">이름</label>
+
+                        <p class="control">
+
+                            <input id="input-name" class="input"
+                                   placeholder="홍길동" value="{{ user_info.profile_name }}">
+                        </p>
+                    </div>
+                    <div class="field">
+                        <label class="label" for="input-pic">프로필 사진</label>
+
+                        <div class="control is-expanded">
+                            <div class="file has-name">
+                                <label class="file-label" style="width:100%">
+                                    <input id="input-pic" class="file-input" type="file"
+                                           name="resume">
+                                    <span class="file-cta"><span class="file-icon"><i
+                                            class="fa fa-upload"></i></span>
+                                <span class="file-label">파일 선택</span>
+                            </span>
+                                    <span id="file-name" class="file-name"
+                                          style="width:100%;max-width:100%">{{ user_info.profile_pic }}</span>
+                                </label>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label" for="textarea-about">나는 누구?</label>
+
+                        <p class="control">
+
+                        <textarea id="textarea-about" class="textarea"
+                                  placeholder="자기소개하기">{{ user_info.profile_info }}</textarea>
+                        </p>
+                    </div>
+                    <nav class="level is-mobile">
+                        <div class="level-left">
+
+                        </div>
+                        <div class="level-right">
+                            <div class="level-item">
+                                <a class="button is-sparta" onclick="update_profile()">업데이트</a>
+                            </div>
+                            <div class="level-item">
+                                <a class="button is-sparta is-outlined"
+                                   onclick='$("#modal-edit").removeClass("is-active")'>취소</a>
+                            </div>
+                        </div>
+                    </nav>
+                </div>
+            </article>
+        </div>
+    </div>
+    <button class="modal-close is-large" aria-label="close"
+            onclick='$("#modal-edit").removeClass("is-active")'></button>
+</div>
+
+{#{% if status %}#}
+<section class="section">
+    <article class="media">
+        <figure class="media-left" style="align-self: center">
+            <a class="image is-32x32" href="/user/{{ user_info.nickname }}">
+                <img class="is-rounded"
+                     src="{{ url_for("static", filename="profile_pics/profile_placeholder.png") }}">
+            </a>
+        </figure>
+        <div class="media-content">
+            <div class="field">
+                <p class="control">
+                    <input id="input-post" class="input is-rounded" placeholder="오늘의 한마디"
+                           onclick='$("#modal-post").addClass("is-active")'>
+                </p>
+            </div>
+        </div>
+    </article>
+</section>
+
+<div class="modal" id="modal-post">
+    <div class="modal-background" onclick='$("#modal-post").removeClass("is-active")'></div>
+    <div class="modal-content">
+        <div class="box">
+            <article class="media">
+                <div class="media-content">
+                    <div class="field">
+                        <p class="control">
+                                        <textarea id="textarea-post" class="textarea"
+                                                  placeholder="오늘의 한마디"></textarea>
+                        </p>
+                    </div>
+                    <nav class="level is-mobile">
+                        <div class="level-left">
+
+                        </div>
+                        <div class="level-right">
+                            <div class="level-item">
+                                <a class="button is-sparta" onclick="comment()">한마디하기</a>
+                            </div>
+                            <div class="level-item">
+                                <a class="button is-sparta is-outlined"
+                                   onclick='$("#modal-post").removeClass("is-active")'>취소</a>
+                            </div>
+                        </div>
+                    </nav>
+                </div>
+            </article>
+        </div>
+    </div>
+    <button class="modal-close is-large" aria-label="close"
+            onclick='$("#modal-post").removeClass("is-active")'></button>
+</div>
+{#{% endif %}#}
+<section class="section">
+    <div id="comment-box" class="container">
+        <div class="box">
+            <article class="media">
+                <div class="media-left">
+                    <a class="image is-64x64" href="/user/{{ user_info.nickname }}">
+                        <img class="is-rounded"
+                             src={{ url_for("static", filename="profile_pics/profile_placeholder.png") }} alt="Image">
+                    </a>
+                </div>
+                <div class="media-content">
+                    <div class="content">
+                        <p>
+                            <strong>이름을 적어주세요</strong> <small>@username</small> <small>10분 전</small>
+                            <br>
+                            오늘의 한마디?
+                        </p>
+                        <nav class="level is-mobile">
+                            <div class="level-left">
+                                <a class="level-item is-sparta" aria-label="heart" onclick="toggle_like('', 'heart')">
+                                    <span class="icon is-small"><i class="fa-heart" aria-hidden="true"></i></span>&nbsp;<span
+                                        class="like-num">2.7k</span>
+                                </a>
+                            </div>
+                        </nav>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </div>
+</section>
+
+</body>
