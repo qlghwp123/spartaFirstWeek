@@ -13,7 +13,9 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
     <!-- Font Awesome CSS -->
     <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300&display=swap" rel="stylesheet">
     <!-- JS -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
@@ -26,11 +28,20 @@
           integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 
     <style>
+        * {
+            font-family: 'IBM Plex Sans KR', sans-serif;
+
+        }
         body {
             background-color: #fff7cb;
             min-height: 100vh;
         {#padding-top: 3.25rem;#}
 
+        }
+        .wrap {
+            width: 100%;
+            height: 200px;
+            background-color: #fffee2;
         }
 
         .today {
@@ -39,15 +50,18 @@
 
              }
         .title {
-            font-weight: 800;
-            font-size: 5rem;
+
+            font-size: 55px;
+            font-family: 'Rajdhani', sans-serif;
+            color: #ff6d0a;
 
 
         }
 
         .subtitle {
-            font-size: 2rem;
-
+            font-size: 25px;
+            color: black;
+            font-weight: bold;
 
         }
 
@@ -62,17 +76,21 @@
         }
 
         .button.is-sparta {
-            background-color: #e8344e;
+            background-color: #ffe9a4;
             border-color: transparent;
-            color: #fff !important;
+            color: dimgray !important;
+            border-radius: 20px;
         }
 
         .button.is-sparta.is-outlined {
             background-color: transparent;
-            border-color: #e8344e;
-            color: #e8344e !important;
+            border-color: #ffe9a4;
+            color: #ff9202 !important;
+            border-radius: 20px;
         }
-
+        .button.is-sparta.is-outlined:hover {
+                border: 3px solid palegoldenrod;
+            }
         .modal-content {
             width: 600px;
             max-width: 80%;
@@ -89,7 +107,7 @@
         }
 
         .card-box {
-            margin: 20px 40px auto 40px;
+            margin: 30px 40px auto 40px;
 
         }
 
@@ -104,13 +122,14 @@
             height: 40px;
             border: 1px solid pink;
             border-radius: 25px;
-            font-family: 'Gowun Dodum', sans-serif;
+            font-weight: bold;
+            font-size: 20px;
         }
 
 
         .card {
             height: 400px;
-            margin: 20px;
+            margin: 30px;
 
         }
 
@@ -125,8 +144,27 @@
             justify-content: end;
             align-items: end;
             margin: 10px;
-
         }
+        .button.is-today {
+            border-radius: 20px;
+            font-size: larger;
+            background-color: #b2ffbe;
+            color: black;
+            margin-right: 80px;
+            font-weight: bold;
+        }
+        .button.is-logout {
+            font-size: small;
+            margin-right: 60px;
+            color: black;
+        }
+        .button.is-logout:hover {
+            border: 3px solid #b2ffbe;
+        }
+        img.banner {
+                 position: absolute;
+                 right: 60px;
+             }
     </style>
 
     <script>
@@ -160,22 +198,25 @@
 
 </head>
 <body>
-<div class="titlebox">
+
 <div class="wrap">
     <section class="section3">
-            <h1 class="title is-sparta">Today's Youtube Video</h1>
-            <h3 class="subtitle is-sparta">오늘의 영상을 시청청해보세요.</h3>
-       </div>
+        <img class="banner" src='https://ifh.cc/g/XGNrO4.jpg' border='0'></a>
+     <h1 class="title">　Today's Youtube Video</h1>
+
+        <h3 class="subtitle">
+            <span class="placeholder col-12 bg-light">　　　　　　　　　　오늘의 영상을 시청해보세요.</span>　　　　　　　　　
+        </h3>
 
 
         <div class="buttonbox">
-            <button class="button is-danger" onclick="location.href='/writing'">오늘의 한마디</button>
-            <p>　　</p>
-        <button class="button is-danger is-small" onclick="logout()">로그아웃하기</button>
+            <button class="button is-today" onclick="location.href='/writing'">오늘의 한마디</button>
+        <button class="button is-logout" onclick="logout()">로그아웃하기</button>
         </div>
         <p class="today" id="date"></p>
+    </div>
     </section>
-</div>
+
 
     {% if videos is not none %}
         <div class="card-box">
@@ -215,17 +256,17 @@
                                 <div class="form-floating mb-3">
                                     <input type="url" class="form-control" id="url"
                                            placeholder="name@example.com">
-                                    <label for="floatingInput">영화URL</label>
+                                    <label for="floatingInput">유튜브 URLL</label>
                                 </div>
                                 <div class="input-group mb-3">
-                                    <label class="input-group-text" for="inputGroupSelect01">이모티콘</label>
+                                    <label class="input-group-text" for="inputGroupSelect01">오늘의 감정</label>
                                     <select class="form-select" id="emoticon">
                                         <option selected>--선택하기--</option>
-                                        <option value="1">1점</option>
-                                        <option value="2">2점</option>
-                                        <option value="3">3점</option>
-                                        <option value="4">4점</option>
-                                        <option value="5">5점</option>
+                                        <option value="1">😑</option>
+                                        <option value="2">😆</option>
+                                        <option value="3">🙂</option>
+                                        <option value="4">😢</option>
+                                        <option value="5">😡</option>
                                     </select>
                                 </div>
                                 <div class="form-floating">
@@ -250,6 +291,37 @@
                                 </div>
                             </div>
                         </nav>
+                    </div>
+                </article>
+            </div>
+        </div>
+        <button class="modal-close is-large" aria-label="close"
+                onclick='$("#video-post").removeClass("is-active")'></button>
+    </div>
+
+
+    <p><button class="writebtn" onclick='$("#video-post").addClass("is-active")'>추가하기</button></p>
+
+
+</div>
+
+
+
+</body>
+
+<script>
+    // 오늘 날짜 메인 화면에 띄우기 위한 변수 정의
+    let today = new Date();
+    let year = today.getFullYear() // 년도
+    let month = today.getMonth() + 1 // 월
+    let day = today.getDate() // 일
+    let week = ['일', '월', '화', '수', '목', '금']
+    let getDate = today.getDay() // 요일
+    let date = week[getDate]
+    document.getElementById("date").innerHTML = year + '년 ' + month + '월 ' + day + '일 ' + date + "요일"
+</script>
+</html>
+
                     </div>
                 </article>
             </div>
