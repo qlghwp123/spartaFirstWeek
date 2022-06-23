@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="en">
+<head>
+
+    <!-- Webpage Title -->
+    <title>Home | Today's YouTube</title>
+
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bulma CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+    <!-- Font Awesome CSS -->
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+    <!-- JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+
+    <!-- Google Web Font for title and sub -->
+    <link href="https://fonts.googleapis.com/css2?family=Jua&family=Yeon+Sung&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Yeon+Sung&display=swap" rel="stylesheet">
+
+    <!-- Google Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+    <style>
+        body {
+            background-color: RGBA(232, 52, 78, 0.2);
+            min-height: 100vh;
+        {#padding-top: 3.25rem;#}
+        }
+
+        .title {
+            margin-top: 30px;
+            font-weight: 600;
+            font-size: 4rem;
+
+            font-family: 'Jua', sans-serif;
+            font-family: 'Yeon Sung', cursive;
+        }
+
+        .subtitle {
+            font-size: 2rem;
+
+            font-family: 'Nanum Brush Script', cursive;
+        }
+
+        .section {
+            padding: 1rem 1.5rem;
+            max-width: 750px;
+            margin: auto;
+        }
+
+        .is-sparta {
+            color: #e8344e !important;
+        }
+
+        .button.is-sparta {
+            background-color: #e8344e;
+            border-color: transparent;
+            color: #fff !important;
+        }
+
+        .button.is-sparta.is-outlined {
+            background-color: transparent;
+            border-color: #e8344e;
+            color: #e8344e !important;
+        }
+
+        .modal-content {
+            width: 600px;
+            max-width: 80%;
+        }
+
+        input::-webkit-calendar-picker-indicator {
+            display: none;
+        }
+
+        .image img {
+            object-fit: cover;
+            width: 100%;
+            height: 100%;
+        }
+
+        .card-box {
+            margin: 20px 40px auto 40px;
+        }
+
+        .writebtn {
+            position: fixed;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            background: rgba(233, 30, 99, 0.7);
+            width: 150px;
+            height: 40px;
+            border: 1px solid pink;
+            border-radius: 25px;
+            font-family: 'Gowun Dodum', sans-serif;
+        }
+
+        .card {
+            height: 500px;
+        }
+
+        .wrap {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+    </style>
+
+    <script>
+         function sign_out() {
+            $.removeCookie('mytoken', {path: '/'});
+            alert('로그아웃!')
+            window.location.href = "/login"
+        }
+
+        function post() {
+            let url = $("#url").val()
+            let emoticon = $("#emoticon").val()
+            let comment = $("#comment").val()
+
+            $.ajax({
+                type: "POST",
+                url: "/posting",
+                data: {
+                    url_give: url,
+                    emoticon_give: emoticon,
+                    comment_give: comment
+                },
+                success: function (response) {
+                    $("#video-post").removeClass("is-active")
+                    window.location.reload()
+                }
+            })
+        }
+
+    </script>
+
+</head>
+<body>
+    <nav class="navbar is-fixed-top is-white" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="/">
+                <img src="{{ url_for('static', filename='U_logo.png') }}">
+                <strong class="is-sparta"
+                        style="font-family: 'Jua', sans-serif;font-size: larger;">YouTube Clip</strong>
+            </a>
+        </div>
+
+        <div class="navbar-end">
+            <p><strong>{{ nickname }}님</strong></p>
+        </div>
+
+        <div>
+            <button onclick="sign_out()" class="button is-logout" id="logout-btn" style="position: absolute; right: 0;">
+                Logout
+            </button>
+        </div>
+    </nav>
+
+    <div class="wrap">
+        <section class="hero is-white">
+            <div class="hero-body has-text-centered" style="padding-bottom:1rem;margin:auto;">
+                <h1 class="title is-sparta">Youtube Clip</h1>
+                <h3 class="subtitle is-sparta">Recommend yours</h3>
+            </div>
+        </section>
+            {% if videos is not none %}
+                <div class="card-box">
+                    <div class="row row-cols-1 row-cols-md-3 g-4">
+                        {% for video in videos %}
+                            <div class="col">
+                                <div class="card">
+                                    <iframe width="100%" height="100%" src="{{ video.embed }}" title="YouTube video player"
+                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                            allowfullscreen></iframe>
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ video.nickname }}</h5>
+                                        <p class="card-text">{{ video.comment }}</p>
+                                        <p> {{ video.emoticon }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        <div class="modal" id="video-post">
+            <div class="modal-background" onclick='$("#video-post").removeClass("is-active")'></div>
+            <div class="modal-content">
+                <div class="box">
+                    <article class="media">
+                        <div class="media-content">
+                            <div class="field">
+                                <p class="control">
+                                <div class="mypost" id="postbox">
+                                    <div class="form-floating mb-3">
+                                        <input type="url" class="form-control" id="url"
+                                               placeholder="name@example.com">
+                                        <label for="floatingInput">유튜브 URL</label>
+                                    </div>
+                                    <div class="input-group mb-3">
+                                        <label class="input-group-text" for="inputGroupSelect01">오늘의 감정</label>
+                                        <select class="form-select" id="emoticon">
+                                            <option selected>--선택하기--</option>
+                                            <option value="1">😑</option>
+                                            <option value="2">😆</option>
+                                            <option value="3">🙂</option>
+                                            <option value="4">😢</option>
+                                            <option value="5">😡</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-floating">
+                                        <textarea class="form-control" placeholder="Leave a comment here" id="comment"
+                                                  style="height: 100px"></textarea>
+                                        <label for="floatingTextarea2">코멘트</label>
+                                    </div>
+                                </div>
+                                </p>
+                            </div>
+                            <nav class="level is-mobile">
+                                <div class="level-left">
+
+                                </div>
+                                <div class="level-right">
+                                    <div class="level-item">
+                                        <a class="button is-sparta" onclick="post()">포스팅하기</a>
+                                    </div>
+                                    <div class="level-item">
+                                        <a class="button is-sparta is-outlined"
+                                           onclick='$("#video-post").removeClass("is-active")'>취소</a>
+                                    </div>
+                                </div>
+                            </nav>
+                        </div>
+                    </article>
+                </div>
+            </div>
+            <button class="modal-close is-large" aria-label="close"
+                    onclick='$("#video-post").removeClass("is-active")'></button>
+        </div>
+        <button class="writebtn" onclick='$("#video-post").addClass("is-active")'>추가하기</button>
+    </div>
+</body>
+</html>
