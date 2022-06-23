@@ -28,10 +28,10 @@
 
 ---
 
-Server : AWS EC2 (Ubuntu 20.04 LTS)
-Framework : Flask (Python)
-Database : MongoDB
-View : HTML5 / CSS3 / Javascript / JQuery 3.5.1
+- Server : AWS EC2 (Ubuntu 20.04 LTS)
+- Framework : Flask (Python)
+- Database : MongoDB
+- View : HTML5 / CSS3 / Javascript / JQuery 3.5.1
 
 ### **⚙핵심기능**
 
