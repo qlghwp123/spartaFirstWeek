@@ -233,7 +233,7 @@ def update_like():
     try:
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
         # 좋아요 수 변경
-        user_info = db.users.find_one({"username": payload["id"]})
+        user_info = db.users.find_one({"id": payload["id"]})
         post_id_receive = request.form["post_id_give"]
         type_receive = request.form["type_give"]
         action_receive = request.form["action_give"]
