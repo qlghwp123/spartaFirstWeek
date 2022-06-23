@@ -27,6 +27,19 @@
           integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 
     <style>
+        #form_name {
+            align-content: space-between;
+            gap: 20px;
+            position: absolute;
+            right: 8%;
+        }
+
+        #wel_name {
+            font: normal 1.125rem "Noto Sans KR";
+            padding-top: 20px;
+            box-sizing: border-box;
+        }
+
         body {
             background-color: RGBA(232, 52, 78, 0.2);
             min-height: 100vh;
@@ -112,6 +125,7 @@
             height: 100%;
             position: relative;
         }
+
     </style>
 
     <script>
@@ -123,7 +137,7 @@
 
         function post() {
             let url = $("#url").val()
-            let emoticon = $("#emoticon").val()
+            let emoticon = $("#emoticon option:checked").text()
             let comment = $("#comment").val()
 
             $.ajax({
@@ -153,16 +167,12 @@
                         style="font-family: 'Jua', sans-serif;font-size: larger;">YouTube Clip</strong>
             </a>
         </div>
-
-        <div class="navbar-end">
-            <p><strong>{{ nickname }}님</strong></p>
-        </div>
-
-        <div>
-            <button onclick="sign_out()" class="button is-logout" id="logout-btn" style="position: absolute; right: 0;">
-                Logout
-            </button>
-        </div>
+        <form id="form_name" class="d-flex">
+            <p id="wel_name" class="color_w">{{ nickname }}님</p>
+        </form>
+        <button onclick="sign_out()" class="button is-logout" id="logout-btn" style="position: absolute; right: 0;">
+            Logout
+        </button>
     </nav>
 
     <div class="wrap">
