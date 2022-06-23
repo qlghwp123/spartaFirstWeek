@@ -25,12 +25,13 @@ def home():
 
         all_users = list(db.users.find({}, {'_id': False}))
         videos = list(db.videos.find({}, {'_id': False}))
-
         return render_template('index.html', all_user=all_users, videos=videos)
+
     except jwt.ExpiredSignatureError:
         return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
     except jwt.exceptions.DecodeError:
         return redirect(url_for("login", msg="로그인 정보가 존재하지 않습니다."))
+
 
 
 @app.route('/login')
@@ -114,7 +115,7 @@ def posting():
     token_receive = request.cookies.get('mytoken')
     try:
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-        user_info = db.users.find_one({"id": payload["id"]})
+        user_info = db.users.find_one({"username": payload["id"]})
 
         url_receive = request.form["url_give"]
         emoticon_receive = request.form["emoticon_give"]
@@ -126,9 +127,8 @@ def posting():
             embed = 'https://www.youtube.com/embed/' + embed.split('&')[0]
 
 
-
         doc = {
-            "id": user_info["id"],
+            "username": user_info["username"],
             "nickname":user_info["nickname"],
             "embed": embed,
             "emoticon":emoticon_receive,
@@ -140,17 +140,45 @@ def posting():
         return redirect(url_for("home"))
 
 
-# @app.route("/get_posts", methods=['GET'])
-# def get_posts():
-#     token_receive = request.cookies.get('mytoken')
-#     try:
-#         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-#         # 포스팅 목록 받아오기
-#         return jsonify({"result": "success", "msg": "포스팅을 가져왔습니다."})
-#     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
-#         return redirect(url_for("home"))
-#
-#
+
+@app.route('/commenting', methods=['POST'])
+def commenting():
+    token_receive = request.cookies.get('mytoken')
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+        user_info = db.users.find_one({"username": payload["id"]})
+
+
+        comment_receive = request.form["comment_give"]
+        date_receive = request.form["date_give"]
+
+        doc = {
+            "username": user_info["username"],
+            "nickname":user_info["nickname"],
+            "comment":comment_receive,
+            "date":date_receive
+        }
+        db.comments.insert_one(doc)
+        return jsonify({"result": "success", 'msg': '댓글 완료'})
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("writing"))
+
+
+
+
+@app.route("/get_comments", methods=['GET'])
+def get_comments():
+    token_receive = request.cookies.get('mytoken')
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+        comments = list(db.comments.find({}).sort("date", -1).limit(20))
+        for comment in comments:
+            comment["_id"] = str(comment["_id"])
+        return jsonify({"result": "success", "msg": "포스팅을 가져왔습니다.", "comments": comments} )
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("home"))
+
+
 # @app.route('/update_like', methods=['POST'])
 # def update_like():
 #     token_receive = request.cookies.get('mytoken')
@@ -160,6 +188,85 @@ def posting():
 #         return jsonify({"result": "success", 'msg': 'updated'})
 #     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
 #         return redirect(url_for("home"))
+
+@app.route('/writing')
+def write():
+    title = "댓글 달기"
+    token_receive = request.cookies.get('mytoken')
+    user_info = ''
+    if (token_receive is not None):
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+        user_info = db.users.find_one({"id": payload["id"]})
+    return render_template('write.html', title=title, user_info=user_info)
+
+
+
+
+
+if __name__ == '__main__':
+    app.run('0.0.0.0', port=5000, debug=True)
+
+
+@app.route('/commenting', methods=['POST'])
+def commenting():
+    token_receive = request.cookies.get('mytoken')
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+        user_info = db.users.find_one({"username": payload["id"]})
+
+
+        comment_receive = request.form["comment_give"]
+        date_receive = request.form["date_give"]
+
+        doc = {
+            "username": user_info["username"],
+            "nickname":user_info["nickname"],
+            "comment":comment_receive,
+            "date":date_receive
+        }
+        db.comments.insert_one(doc)
+        return jsonify({"result": "success", 'msg': '댓글 완료'})
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("writing"))
+
+
+
+
+@app.route("/get_comments", methods=['GET'])
+def get_comments():
+    token_receive = request.cookies.get('mytoken')
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+        comments = list(db.comments.find({}).sort("date", -1).limit(20))
+        for comment in comments:
+            comment["_id"] = str(comment["_id"])
+        return jsonify({"result": "success", "msg": "포스팅을 가져왔습니다.", "comments": comments} )
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("home"))
+
+
+# @app.route('/update_like', methods=['POST'])
+# def update_like():
+#     token_receive = request.cookies.get('mytoken')
+#     try:
+#         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+#         # 좋아요 수 변경
+#         return jsonify({"result": "success", 'msg': 'updated'})
+#     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+#         return redirect(url_for("home"))
+
+@app.route('/writing')
+def write():
+    title = "댓글 달기"
+    token_receive = request.cookies.get('mytoken')
+    user_info = ''
+    if (token_receive is not None):
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+        user_info = db.users.find_one({"id": payload["id"]})
+    return render_template('write.html', title=title, user_info=user_info)
+
+
+
 
 
 if __name__ == '__main__':
